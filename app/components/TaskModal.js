@@ -9,16 +9,16 @@ export default function TaskModal({ onClose, onAdd }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!title.trim()) {
-      alert('Por favor ingresa un título para la tarea');
+      alert("Por favor ingresa un título para la tarea");
       return;
     }
-    
+
     setIsSubmitting(true);
     try {
       await onAdd(title.trim());
       setTitle("");
     } catch (error) {
-      console.error('Error al crear tarea:', error);
+      console.error("Error al crear tarea:", error);
     } finally {
       setIsSubmitting(false);
     }
@@ -54,23 +54,33 @@ export default function TaskModal({ onClose, onAdd }) {
         <h2 style={{ marginBottom: "1rem", textAlign: "center" }}>
           Nueva tarea
         </h2>
-        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-          <input
-            type="text"
+        <form
+          onSubmit={handleSubmit}
+          style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
+        >
+          <textarea
             placeholder="Escribe tu tarea..."
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             disabled={isSubmitting}
+            rows={4}
             style={{
               padding: "0.75rem",
               border: "1px solid #ddd",
               borderRadius: "6px",
               fontSize: "1rem",
               outline: "none",
+              resize: "vertical", // Permite al usuario ajustar el tamaño si quiere
             }}
             autoFocus
           />
-          <div style={{ display: "flex", justifyContent: "space-between", gap: "1rem" }}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              gap: "1rem",
+            }}
+          >
             <button
               type="button"
               onClick={onClose}
@@ -95,9 +105,11 @@ export default function TaskModal({ onClose, onAdd }) {
                 padding: "0.75rem",
                 border: "none",
                 borderRadius: "6px",
-                background: (!title.trim() || isSubmitting) ? "#ccc" : "#0070f3",
+                background:
+                  !title.trim() || isSubmitting ? "#ccc" : "#0070f3",
                 color: "white",
-                cursor: (!title.trim() || isSubmitting) ? "not-allowed" : "pointer",
+                cursor:
+                  !title.trim() || isSubmitting ? "not-allowed" : "pointer",
               }}
             >
               {isSubmitting ? "Creando..." : "Crear"}
