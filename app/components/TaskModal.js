@@ -5,11 +5,18 @@ import { useState } from "react";
 export default function TaskModal({ onClose, onAdd }) {
   const [title, setTitle] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const MAX_CHARS = 100;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
     if (!title.trim()) {
       alert("Por favor ingresa un título para la tarea");
+      return;
+    }
+
+    if (title.length > MAX_CHARS) {
+      alert(`El título no puede tener más de ${MAX_CHARS} caracteres`);
       return;
     }
 
@@ -23,6 +30,8 @@ export default function TaskModal({ onClose, onAdd }) {
       setIsSubmitting(false);
     }
   };
+
+  const charsRemaining = MAX_CHARS - title.length;
 
   return (
     <div
@@ -56,7 +65,7 @@ export default function TaskModal({ onClose, onAdd }) {
         </h2>
         <form
           onSubmit={handleSubmit}
-          style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
+          style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}
         >
           <textarea
             placeholder="Escribe tu tarea..."
@@ -64,16 +73,28 @@ export default function TaskModal({ onClose, onAdd }) {
             onChange={(e) => setTitle(e.target.value)}
             disabled={isSubmitting}
             rows={4}
+            maxLength={MAX_CHARS}
             style={{
               padding: "0.75rem",
               border: "1px solid #ddd",
               borderRadius: "6px",
               fontSize: "1rem",
               outline: "none",
-              resize: "vertical", // Permite al usuario ajustar el tamaño si quiere
+              resize: "vertical",
             }}
             autoFocus
           />
+          
+          {/* Contador de caracteres */}
+          <div style={{ 
+            textAlign: "right", 
+            fontSize: "0.8rem", 
+            color: charsRemaining < 20 ? "#ff6b6b" : "#666",
+            marginBottom: "0.5rem"
+          }}>
+            {charsRemaining} caracteres restantes
+          </div>
+
           <div
             style={{
               display: "flex",
@@ -99,17 +120,17 @@ export default function TaskModal({ onClose, onAdd }) {
             </button>
             <button
               type="submit"
-              disabled={isSubmitting || !title.trim()}
+              disabled={isSubmitting || !title.trim() || title.length > MAX_CHARS}
               style={{
                 flex: 1,
                 padding: "0.75rem",
                 border: "none",
                 borderRadius: "6px",
-                background:
-                  !title.trim() || isSubmitting ? "#ccc" : "#0070f3",
+                background: 
+                  !title.trim() || isSubmitting || title.length > MAX_CHARS ? "#ccc" : "#0070f3",
                 color: "white",
-                cursor:
-                  !title.trim() || isSubmitting ? "not-allowed" : "pointer",
+                cursor: 
+                  !title.trim() || isSubmitting || title.length > MAX_CHARS ? "not-allowed" : "pointer",
               }}
             >
               {isSubmitting ? "Creando..." : "Crear"}

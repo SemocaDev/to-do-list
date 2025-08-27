@@ -1,14 +1,20 @@
 "use client";
 
 import { useState } from "react";
+import TaskDetailModal from "./TaskDetailModal";
 
-export default function TaskItem({ task, onDelete, onToggle }) {
-  const [showModal, setShowModal] = useState(false);
+export default function TaskItem({ task, onDelete, onToggle, onUpdate }) {
+  const [showDetailModal, setShowDetailModal] = useState(false);
 
   // Limita el texto a 40 caracteres y muestra "..." si es más largo
   const maxChars = 40;
   const isLong = task.title.length > maxChars;
   const displayText = isLong ? task.title.slice(0, maxChars) + "..." : task.title;
+
+  const handleUpdate = async (id, newTitle) => {
+    await onUpdate(id, newTitle);
+    setShowDetailModal(false);
+  };
 
   return (
     <>
@@ -49,7 +55,7 @@ export default function TaskItem({ task, onDelete, onToggle }) {
             />
           </button>
           <span
-            onClick={() => setShowModal(true)}
+            onClick={() => setShowDetailModal(true)}
             style={{
               textDecoration: task.completed ? "line-through" : "none",
               color: task.completed ? "#666" : "black",
@@ -94,52 +100,13 @@ export default function TaskItem({ task, onDelete, onToggle }) {
           />
         </button>
       </li>
-      {showModal && (
-        <div
-          style={{
-            position: "fixed",
-            top: 0, left: 0, right: 0, bottom: 0,
-            background: "rgba(0,0,0,0.3)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 1000,
-          }}
-          onClick={() => setShowModal(false)}
-        >
-          <div
-            style={{
-              background: "#fff",
-              padding: "2rem",
-              borderRadius: "8px",
-              minWidth: "300px",
-              maxWidth: "90vw",
-              maxHeight: "80vh",
-              overflowY: "auto",
-              boxShadow: "0 2px 12px rgba(0,0,0,0.2)",
-              whiteSpace: "pre-line",
-            }}
-            onClick={e => e.stopPropagation()}
-          >
-            <h3 style={{marginTop:0}}>Detalle de la tarea</h3>
-            <div style={{whiteSpace: "pre-line", fontSize: "1.1rem"}}>{task.title}</div>
-            <button
-              style={{
-                marginTop: "1.5rem",
-                padding: "0.5rem 1.2rem",
-                border: "none",
-                borderRadius: "4px",
-                background: "#4caf50",
-                color: "#fff",
-                cursor: "pointer",
-                fontWeight: "bold"
-              }}
-              onClick={() => setShowModal(false)}
-            >
-              Cerrar
-            </button>
-          </div>
-        </div>
+
+      {showDetailModal && (
+        <TaskDetailModal
+          task={task}
+          onClose={() => setShowDetailModal(false)}
+          onUpdate={handleUpdate}
+        />
       )}
     </>
   );
