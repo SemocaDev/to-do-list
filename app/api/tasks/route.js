@@ -1,6 +1,8 @@
 import { prisma } from '@/app/lib/prisma'
 import { NextResponse } from 'next/server'
 
+const MAX_TITLE_LENGTH = 100;
+
 // GET - Obtener todas las tareas
 export async function GET() {
   try {
@@ -33,6 +35,13 @@ export async function POST(request) {
       return NextResponse.json({
         success: false,
         message: 'El título es requerido'
+      }, { status: 400 })
+    }
+    
+    if (title.length > MAX_TITLE_LENGTH) {
+      return NextResponse.json({
+        success: false,
+        message: `El título no puede tener más de ${MAX_TITLE_LENGTH} caracteres`
       }, { status: 400 })
     }
     

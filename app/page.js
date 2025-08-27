@@ -59,6 +59,33 @@ export default function Home() {
     }
   };
 
+  const updateTask = async (id, title) => {
+    try {
+      const response = await fetch(`/api/tasks/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ title }),
+      });
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        setTasks(tasks.map(task => 
+          task.id === id ? { ...task, title } : task
+        ));
+      } else {
+        alert('Error al actualizar la tarea: ' + result.message);
+        throw new Error(result.message);
+      }
+    } catch (error) {
+      alert('Error de conexión al actualizar la tarea');
+      console.error('Error:', error);
+      throw error;
+    }
+  };
+
   const deleteTask = async (id) => {
     try {
       const response = await fetch(`/api/tasks/${id}`, {
@@ -182,6 +209,7 @@ export default function Home() {
               task={task} 
               onDelete={deleteTask}
               onToggle={toggleTask}
+              onUpdate={updateTask}
             />
           ))}
         </ul>

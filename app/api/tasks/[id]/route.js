@@ -1,16 +1,26 @@
 import { prisma } from '@/app/lib/prisma'
 import { NextResponse } from 'next/server'
 
+const MAX_TITLE_LENGTH = 100;
+
 // PUT - Actualizar tarea
 export async function PUT(request, { params }) {
   try {
     const id = parseInt(params.id)
     const { title, completed } = await request.json()
     
+    // Validar longitud del título si se está actualizando
+    if (title !== undefined && title.length > MAX_TITLE_LENGTH) {
+      return NextResponse.json({
+        success: false,
+        message: `El título no puede tener más de ${MAX_TITLE_LENGTH} caracteres`
+      }, { status: 400 })
+    }
+    
     const task = await prisma.task.update({
       where: { id },
       data: {
-        ...(title !== undefined && { title }),
+        ...(title !== undefined && { title: title.trim() }),
         ...(completed !== undefined && { completed })
       }
     })
