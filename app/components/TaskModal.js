@@ -4,12 +4,24 @@ import { useState } from "react";
 
 export default function TaskModal({ onClose, onAdd }) {
   const [title, setTitle] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!title.trim()) return;
-    onAdd(title.trim());
-    setTitle("");
+    if (!title.trim()) {
+      alert('Por favor ingresa un título para la tarea');
+      return;
+    }
+    
+    setIsSubmitting(true);
+    try {
+      await onAdd(title.trim());
+      setTitle("");
+    } catch (error) {
+      console.error('Error al crear tarea:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -25,6 +37,7 @@ export default function TaskModal({ onClose, onAdd }) {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
+        zIndex: 1000,
       }}
     >
       <div
@@ -47,41 +60,47 @@ export default function TaskModal({ onClose, onAdd }) {
             placeholder="Escribe tu tarea..."
             value={title}
             onChange={(e) => setTitle(e.target.value)}
+            disabled={isSubmitting}
             style={{
               padding: "0.75rem",
               border: "1px solid #ddd",
               borderRadius: "6px",
               fontSize: "1rem",
+              outline: "none",
             }}
+            autoFocus
           />
           <div style={{ display: "flex", justifyContent: "space-between", gap: "1rem" }}>
             <button
               type="button"
               onClick={onClose}
+              disabled={isSubmitting}
               style={{
                 flex: 1,
                 padding: "0.75rem",
                 border: "none",
                 borderRadius: "6px",
                 background: "#ccc",
-                cursor: "pointer",
+                cursor: isSubmitting ? "not-allowed" : "pointer",
+                opacity: isSubmitting ? 0.7 : 1,
               }}
             >
               Cancelar
             </button>
             <button
               type="submit"
+              disabled={isSubmitting || !title.trim()}
               style={{
                 flex: 1,
                 padding: "0.75rem",
                 border: "none",
                 borderRadius: "6px",
-                background: "#0070f3",
+                background: (!title.trim() || isSubmitting) ? "#ccc" : "#0070f3",
                 color: "white",
-                cursor: "pointer",
+                cursor: (!title.trim() || isSubmitting) ? "not-allowed" : "pointer",
               }}
             >
-              Crear
+              {isSubmitting ? "Creando..." : "Crear"}
             </button>
           </div>
         </form>
