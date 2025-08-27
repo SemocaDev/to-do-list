@@ -1,14 +1,66 @@
-import TaskForm from "./components/TaskForm";
-import TaskList from "./components/TaskList";
+"use client";
 
-export default function HomePage() {
+import { useState } from "react";
+import TaskItem from "@/app/components/TaskItem";
+import TaskModal from "@/app/components/TaskModal";
+
+export default function Home() {
+  const [tasks, setTasks] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const addTask = (title) => {
+    setTasks([...tasks, { id: Date.now(), title, completed: false }]);
+    setIsModalOpen(false);
+  };
+
+  const deleteTask = (id) => {
+    setTasks(tasks.filter((task) => task.id !== id));
+  };
+
   return (
-    <main className="min-h-screen flex flex-col items-center bg-gray-100 p-8">
-      <section className="w-full max-w-md bg-white shadow-lg rounded-lg p-6">
-        <h1 className="text-2xl font-bold mb-4 text-center">To-do PRUEBA TECNICA</h1>
-        <TaskForm />
-        <TaskList />
-      </section>
+    <main
+      style={{
+        backgroundColor: "white",
+        padding: "2rem",
+        borderRadius: "8px",
+        width: "100%",
+        maxWidth: "500px",
+        boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
+      }}
+    >
+      <h1 style={{ textAlign: "center", marginBottom: "1rem" }}>
+        Lista de Tareas
+      </h1>
+
+      <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
+        {tasks.map((task) => (
+          <TaskItem key={task.id} task={task} onDelete={deleteTask} />
+        ))}
+      </ul>
+
+      <button
+        onClick={() => setIsModalOpen(true)}
+        style={{
+          position: "fixed",
+          bottom: "2rem",
+          right: "2rem",
+          backgroundColor: "#0070f3",
+          color: "white",
+          border: "none",
+          borderRadius: "50%",
+          width: "56px",
+          height: "56px",
+          fontSize: "24px",
+          cursor: "pointer",
+          boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+        }}
+      >
+        +
+      </button>
+
+      {isModalOpen && (
+        <TaskModal onClose={() => setIsModalOpen(false)} onAdd={addTask} />
+      )}
     </main>
   );
 }
